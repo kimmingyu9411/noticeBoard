@@ -3,9 +3,12 @@ const router = express.Router();
 const Post = require("../schemas/post.js");
 const Comment = require("../schemas/comment.js");
 
+//db의 게시글 전체 목록 불러오기//
 router.get("/posts", async (req, res) => {
   const posts = await Post.find({})
+  //db의 게시글 데이터 중 표출 데이터 선정//
   const postList = posts.map((post) => {
+    //db의 오브젝트 아이디를 문자열로 변환//
     postId = String(post._id)
     return {
       "postId": postId,
@@ -17,10 +20,14 @@ router.get("/posts", async (req, res) => {
   res.send({ postList });
 });
 
+//db의 특정 게시글, 게시글의 url을 title로 구분// 
 router.get("/posts/:title", async (req, res) => {
   const posts = await Post.find({});
+  //title의 파라미터 설정//
   const { title } = req.params;
+  //title과 같은 데이터를 서치//
   const search = posts.filter((posts) => posts.title === String(title));
+  //title과 같은 데이터가 없다면 else로 있다면 if구문//
   if (search.length) {
     const searchReslut = search.map((search) => {
       return {
@@ -34,15 +41,22 @@ router.get("/posts/:title", async (req, res) => {
   } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
 });
 
-
+//게시글 형성//
 router.post("/posts", async (req, res) => {
+  //body에서 데이터 받음//
   const { title, content, user, password } = req.body;
+  //작성 시간 설정//
   const day = new Date();
+  //중복 아이디 확인 있다면 else로 없다면 if 구문//
   const existsUser = await Post.find({ user });
   if (existsUser.length === 0) {
+    //데이터를 작성했는지 확인//
     if (title) {
+       //데이터를 작성했는지 확인//
       if (content) {
+         //데이터를 작성했는지 확인//
         if (user) {
+           //데이터를 작성했는지 확인//
           if (password) {
             await Post.create({ title, content, user, password, day });
             res.json({ message: "게시판을 생성하였습니다." })
@@ -54,14 +68,19 @@ router.post("/posts", async (req, res) => {
 }
 );
 
+//게시글 데이터 수정//
 router.put("/posts/:title", async (req, res) => {
   const { title } = req.params;
+   //body에서 데이터 받음//
   const { content, password } = req.body;
-
+  //url의 title이 있는지 확인//
   const [existsPost] = await Post.find({ title: String(title) });
 
+  //url의 title이 존재한다면 if구문 없다면 else로//
   if (existsPost) {
+    //데이터를 작성했는지 확인//
     if (content) {
+      //비밀번호를 제대로 작성했는지 확인//
       if (existsPost.password != password) {
         return res.status(400).json({ message: "데이터형식을 확인해주세요" })
       } else {
@@ -72,13 +91,17 @@ router.put("/posts/:title", async (req, res) => {
   res.json({ message: "게시글을 수정하였습니다." })
 })
 
+//게시글 삭제//
 router.delete("/posts/:title", async (req, res) => {
   const { title } = req.params;
+  //body에서 데이터 받음//
   const { password } = req.body;
-
+  //url의 title이 있는지 확인//
   const [existsPost] = await Post.find({ title: String(title) });
 
+  //url의 title이 없다면 else로 있다면 if구문//
   if (existsPost) {
+    //비밀번호를 제대로 작성했는지 확인//
     if (existsPost.password != password) {
       return res.status(400).json({ message: "데이터형식을 확인해주세요" })
     } else { await Post.deleteOne({ title }) }
