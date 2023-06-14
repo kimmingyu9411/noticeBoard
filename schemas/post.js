@@ -1,18 +1,12 @@
 const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
-  board:{
-    type:Number,
-    required: true,
-    unique: true
-  },
   user: {
     type: String,
     required: true,
-    unique: true
   },
   password: {
-    type:   Number,
+    type: Number,
     required: true,
   },
   title: {
@@ -24,8 +18,7 @@ const postSchema = new mongoose.Schema({
     required: true,
   },
   day: {
-    type: Number,
-    required: true
+    type: Date
   }
 });
 
