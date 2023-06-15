@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Post = require("../schemas/post.js");
-const Comment = require("../schemas/comment.js");
+
 
 //db의 게시글 전체 목록 불러오기//
 router.get("/posts", async (req, res) => {

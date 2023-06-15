@@ -25,8 +25,11 @@ router.get("/posts/:id/comments", async (req, res) => {
 
 //댓글 형성//
 router.post("/posts/:id/comments", async (req, res) => {
-    //body에서 데이터 받음//
     postId = req.params.id;
+    const chkId = Post.find({ _id: Object(postId) })
+    console.log(typeof chkId)
+    if (chkId) { console.log("게시판 특정 완료.") } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
+    //body에서 데이터 받음//
     const { content, user, password } = req.body;
     //작성 시간 설정//
     const day = new Date();
