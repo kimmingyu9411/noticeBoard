@@ -20,17 +20,17 @@ router.get("/posts", async (req, res) => {
   res.send({ postList });
 });
 
-//db의 특정 게시글, 게시글의 url을 title로 구분// 
-router.get("/posts/:title", async (req, res) => {
-  const posts = await Post.find({});
-  //title의 파라미터 설정//
-  const { title } = req.params;
-  //title과 같은 데이터를 서치//
-  const search = posts.filter((posts) => posts.title === String(title));
-  //title과 같은 데이터가 없다면 else로 있다면 if구문//
-  if (search.length) {
-    const searchReslut = search.map((search) => {
+//db의 특정 게시글, 게시글의 url을 id로 구분// 
+router.get("/posts/:id", async (req, res) => {
+  //id의 파라미터 설정//
+  id = req.params.id;
+  //id가 같은 데이터를 서치//
+  const [existsPost] = await Post.find({ _id: Object(id) });
+  //id와 같은 데이터가 없다면 else로 있다면 if구문//
+  if ([existsPost].length) {
+    const searchReslut = [existsPost].map((search) => {
       return {
+        "postId": id,
         "title": search.title,
         "content": search.content,
         "user": search.user,
@@ -39,6 +39,7 @@ router.get("/posts/:title", async (req, res) => {
     })
     res.json({ searchReslut });
   } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
+
 });
 
 //게시글 형성//
@@ -52,11 +53,11 @@ router.post("/posts", async (req, res) => {
   if (existsUser.length === 0) {
     //데이터를 작성했는지 확인//
     if (title) {
-       //데이터를 작성했는지 확인//
+      //데이터를 작성했는지 확인//
       if (content) {
-         //데이터를 작성했는지 확인//
+        //데이터를 작성했는지 확인//
         if (user) {
-           //데이터를 작성했는지 확인//
+          //데이터를 작성했는지 확인//
           if (password) {
             await Post.create({ title, content, user, password, day });
             res.json({ message: "게시판을 생성하였습니다." })
@@ -64,17 +65,17 @@ router.post("/posts", async (req, res) => {
         } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
       } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
     } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
-  }else{ return res.status(400).json({ message: "이미 존재하는 user입니다." })}
+  } else { return res.status(400).json({ message: "이미 존재하는 user입니다." }) }
 }
 );
 
 //게시글 데이터 수정//
-router.put("/posts/:title", async (req, res) => {
-  const { title } = req.params;
-   //body에서 데이터 받음//
+router.put("/posts/:id", async (req, res) => {
+  id = req.params.id;
+  //body에서 데이터 받음//
   const { content, password } = req.body;
   //url의 title이 있는지 확인//
-  const [existsPost] = await Post.find({ title: String(title) });
+  const [existsPost] = await Post.find({ _id: Object(id) });
 
   //url의 title이 존재한다면 if구문 없다면 else로//
   if (existsPost) {
@@ -84,7 +85,7 @@ router.put("/posts/:title", async (req, res) => {
       if (existsPost.password != password) {
         return res.status(400).json({ message: "데이터형식을 확인해주세요" })
       } else {
-        await Post.updateOne({ title: String(title) }, { $set: { content } })
+        await Post.updateOne({ _id: Object(id) }, { $set: { content } })
       }
     } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
   } else { return res.status(400).json({ message: "게시글 조회에 실패했습니다." }) }
@@ -92,19 +93,19 @@ router.put("/posts/:title", async (req, res) => {
 })
 
 //게시글 삭제//
-router.delete("/posts/:title", async (req, res) => {
-  const { title } = req.params;
+router.delete("/posts/:id", async (req, res) => {
+  id = req.params.id;
   //body에서 데이터 받음//
   const { password } = req.body;
   //url의 title이 있는지 확인//
-  const [existsPost] = await Post.find({ title: String(title) });
+  const [existsPost] = await Post.find({ _id: Object(id) });
 
   //url의 title이 없다면 else로 있다면 if구문//
   if (existsPost) {
     //비밀번호를 제대로 작성했는지 확인//
     if (existsPost.password != password) {
       return res.status(400).json({ message: "데이터형식을 확인해주세요" })
-    } else { await Post.deleteOne({ title }) }
+    } else { await Post.deleteOne({ _id: Object(id) }) }
   } else { return res.status(400).json({ message: "게시글 조회에 실패했습니다." }) }
   res.json({ message: "게시글을 삭제해였습니다." });
 })
