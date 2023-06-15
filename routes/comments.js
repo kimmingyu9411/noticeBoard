@@ -6,8 +6,9 @@ const Comment = require("../schemas/comment.js");
 //db의 댓글 목록 불러오기//
 router.get("/posts/:id/comments", async (req, res) => {
     postId = req.params.id
+    //게시판 아이디가 일치하는지 확인//
     const comments = await Comment.find({ postId })
-    //db의 댓글 데이터 중 표출 데이터 선정//
+    //일치한다면 if구문 일치하지 않는다면 else//
     if (comments.length) {
         const commentList = comments.map((comment) => {
             //db의 오브젝트 아이디를 문자열로 변환//
@@ -26,8 +27,8 @@ router.get("/posts/:id/comments", async (req, res) => {
 //댓글 형성//
 router.post("/posts/:id/comments", async (req, res) => {
     postId = req.params.id;
+    //게시판의 id가 유효한 id인지 확인//
     const chkId = Post.find({ _id: Object(postId) })
-    console.log(typeof chkId)
     if (chkId) { console.log("게시판 특정 완료.") } else { return res.status(400).json({ message: "데이터형식을 확인해주세요" }) }
     //body에서 데이터 받음//
     const { content, user, password } = req.body;
